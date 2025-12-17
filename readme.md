@@ -1,5 +1,3 @@
-Bro Don't use AI 
-Project for resume 
 
 <!-- for generate migration -->
 npx sequelize-cli migration:generate --name users-table
