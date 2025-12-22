@@ -7,6 +7,8 @@ import ShoutOut from "../models/ShoutOut.model.js";
 import RatingTitles from "../models/RatingTitles.model.js";
 import UserGiveRating from "../models/usergiveRating.model.js";
 import BlockUser from "../models/BlockUser.model.js";
+import UserCategory from "../models/UserCategory.model.js";
+import Category from "../models/Category.model.js";
 
 User.hasMany(AddPhotos, {
     foreignKey: "user_id",
@@ -106,7 +108,19 @@ BlockUser.belongsTo(User, {
     as: "blocked"
 });
 
+User.belongsToMany(Category, {
+    through: UserCategory,
+    foreignKey: "user_id",
+    otherKey: "category_id",
+    as: "categories"
+});
 
+Category.belongsToMany(User, {
+    through: UserCategory,
+    foreignKey: "category_id",
+    otherKey: "user_id",
+    as: "users"
+});
 
 
 export {
@@ -118,5 +132,7 @@ export {
     ShoutOut,
     UserGiveRating,
     RatingTitles,
-    BlockUser
+    BlockUser,
+    Category,
+    UserCategory
 };
