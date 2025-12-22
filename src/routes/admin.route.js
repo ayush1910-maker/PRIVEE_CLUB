@@ -9,7 +9,7 @@ const router = express.Router()
 
 /**
  * @swagger
- * /register-admin:
+ * /api/v1/admin/register-admin:
  *   post:
  *     summary: Register a new admin
  *     description: Create a new admin account using name, email, and password.
@@ -101,7 +101,7 @@ router.post("/register-admin" ,validate(Joi.object({
 
 /**
  * @swagger
- * /login:
+ * /api/v1/admin/login:
  *   post:
  *     summary: Admin login
  *     description: Authenticate an admin using email and password. Returns an access token and admin details.
@@ -213,7 +213,7 @@ router.post("/login" , validate(Joi.object({
 
 /**
  * @swagger
- * /create-category:
+ * /api/v1/admin/create-category:
  *   post:
  *     summary: Create a new category
  *     description: Allows an authenticated admin to create a new category.
@@ -307,7 +307,7 @@ router.post("/create-category",
 
 /**
  * @swagger
- * /give-category-to-user:
+ * /api/v1/admin/give-category-to-user:
  *   post:
  *     summary: Assign a category to a user
  *     description: Allows an authenticated admin to assign a category to a specific user.
@@ -400,7 +400,7 @@ router.post("/create-category",
  *                   example: Internal server error
  */
 
-router.post("give-category-to-user",
+router.post("/give-category-to-user",
     validate(Joi.object({
         user_id: Joi.number().required(),
         category_id: Joi.number().required()

@@ -16,6 +16,8 @@ import userRouter from './src/routes/user.route.js'
 import editProfile from './src/routes/editProfile.route.js'
 import lookingFor from './src/routes/lookingFor.route.js';
 import userDetails from './src/routes/userDetails.route.js'
+import adminRouter from './src/routes/admin.route.js'
+
 
 const app = express();
 
@@ -40,6 +42,7 @@ app.use("/api/v1/users", userRouter)
 app.use("/api/v1/editProfile" , editProfile)
 app.use("/api/v1/lookingFor" , lookingFor)
 app.use("/api/v1/userDetails" , userDetails)
+app.use("/api/v1/admin" , adminRouter)
 
 
 // database connectivity

@@ -6,12 +6,10 @@ const verifyAdminJWT = async (req, res, next) => {
   try {
     let token = null;
 
-    // From cookies
+    // Extract token from cookies or Authorization header
     if (req.cookies?.adminAccessToken) {
       token = req.cookies.adminAccessToken;
-    }
-    // From header
-    else if (req.header("Authorization")) {
+    } else if (req.header("Authorization")) {
       const authHeader = req.header("Authorization");
       if (authHeader.startsWith("Bearer ")) {
         token = authHeader.replace("Bearer ", "").trim();
@@ -19,16 +17,18 @@ const verifyAdminJWT = async (req, res, next) => {
     }
 
     if (!token) {
-      throw new ApiError(401, "Unauthorized: Admin token required");
+      throw new ApiError(401, "Unauthorized: No admin token provided");
     }
 
-    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    // Verify JWT
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    if (!decodedToken?.id) {
-      throw new ApiError(401, "Invalid admin token");
+    if (!decoded?.id) {
+      throw new ApiError(401, "Invalid admin token payload");
     }
 
-    const admin = await Admin.findByPk(decodedToken.id, {
+    // Fetch admin from DB excluding password
+    const admin = await Admin.findByPk(decoded.id, {
       attributes: { exclude: ["password"] },
     });
 
@@ -40,10 +40,8 @@ const verifyAdminJWT = async (req, res, next) => {
     next();
 
   } catch (err) {
-    console.error("Admin JWT Error:", err.message);
-    return res
-      .status(401)
-      .json({ status: false, message: err.message });
+    console.error("Admin JWT Verification Error:", err.message);
+    return res.status(401).json({ status: false, message: err.message });
   }
 };
 
