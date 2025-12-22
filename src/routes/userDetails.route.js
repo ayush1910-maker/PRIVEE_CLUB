@@ -1,7 +1,7 @@
 import express from "express"
 import Joi from "joi"
 import { validate } from "../utils/validate.js"
-import { AddRatingsTitles, blockUser, getNewestMember, getShoutOut, getUploadedPhotos, getUploadedPrivatePhotos, getUserRatings, giveRating, reportUser } from "../controller/userDetails.controller.js"
+import { AddRatingsTitles, blockUser, getNewApplicants, getNewestBeautifulMembers, getPopularMembers, getReadyToInteract, getShoutOut, getUploadedPhotos, getUploadedPrivatePhotos, getUserRatings, giveRating, HomeScreen, reportUser } from "../controller/userDetails.controller.js"
 import verifyJWT from "../middlewares/auth.middleware.js"
 
 
@@ -57,15 +57,15 @@ router.get("/getShoutOut" , getShoutOut)
 
 /**
  * @swagger
- * /api/v1/userDetails/getNewestMember:
+ * /api/v1/userDetails/homeScreen:
  *   get:
+ *     summary: Home screen data
+ *     description: Fetches categorized user lists for the home screen such as newest members, new applicants, popular members, and ready-to-interact users.
  *     tags:
- *       - User Details
- *     summary: Get newest registered members
- *     description: Fetches users ordered by creation date descending.
+ *       - Home
  *     responses:
  *       200:
- *         description: Newest members fetched
+ *         description: Home screen data fetched successfully
  *         content:
  *           application/json:
  *             schema:
@@ -74,35 +74,284 @@ router.get("/getShoutOut" , getShoutOut)
  *                 status:
  *                   type: boolean
  *                   example: true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     newest beautiful members:
+ *                       type: array
+ *                       items:
+ *                         $ref: '#/components/schemas/HomeUser'
+ *                     new applicants:
+ *                       type: array
+ *                       items:
+ *                         $ref: '#/components/schemas/HomeUser'
+ *                     popular members:
+ *                       type: array
+ *                       items:
+ *                         $ref: '#/components/schemas/HomeUser'
+ *                     ready to interact:
+ *                       type: array
+ *                       items:
+ *                         $ref: '#/components/schemas/HomeUser'
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
  *                 message:
  *                   type: string
- *                   example: "Newest Member Fetched!"
+ *                   example: Internal server error
+ */
+
+router.get("/homeScreen", HomeScreen);
+
+
+/**
+ * @swagger
+ * /NewestBeautifulMembers:
+ *   get:
+ *     summary: Get newest beautiful members
+ *     description: Fetch all users who belong to the "newest beautiful members" category, ordered by newest first.
+ *     tags:
+ *       - Home
+ *     responses:
+ *       200:
+ *         description: Newest beautiful members fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: true
  *                 data:
  *                   type: array
  *                   items:
  *                     type: object
  *                     properties:
+ *                       id:
+ *                         type: integer
+ *                         example: 1
  *                       first_name:
  *                         type: string
- *                         example: "Ayush"
- *                       profile_name:
+ *                         example: Ayush
+ *                       last_name:
  *                         type: string
- *                         example: "ayush_dev"
+ *                         example: Sharma
  *                       date_of_birth:
  *                         type: string
- *                         example: "2000-01-01"
- *                       height:
- *                         type: number
- *                         example: 170
- *                       weight:
- *                         type: number
- *                         example: 65
- *                       nationality:
+ *                         format: date
+ *                         example: 1998-05-20
+ *                       upload_selfie:
  *                         type: string
- *                         example: "Indian"
+ *                         example: uploads/selfie123.jpg
+ *                       created_at:
+ *                         type: string
+ *                         format: date-time
+ *                         example: 2024-12-10T10:30:00Z
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Internal server error
  */
 
-router.get("/getNewestMember" , getNewestMember)
+router.get("/NewestBeautifulMembers" , getNewestBeautifulMembers)
+
+/**
+ * @swagger
+ * /NewApplicants:
+ *   get:
+ *     summary: Get new applicants
+ *     description: Fetch the latest users who belong to the "new applicants" category.
+ *     tags:
+ *       - Home
+ *     responses:
+ *       200:
+ *         description: New applicants fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                         example: 1
+ *                       first_name:
+ *                         type: string
+ *                         example: Ayush
+ *                       last_name:
+ *                         type: string
+ *                         example: Sharma
+ *                       date_of_birth:
+ *                         type: string
+ *                         format: date
+ *                         example: 1999-08-15
+ *                       upload_selfie:
+ *                         type: string
+ *                         example: uploads/selfie456.jpg
+ *                       created_at:
+ *                         type: string
+ *                         format: date-time
+ *                         example: 2024-12-12T09:45:00Z
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Internal server error
+ */
+
+router.get("NewApplicants" , getNewApplicants)
+
+
+/**
+ * @swagger
+ * /PopularMembers:
+ *   get:
+ *     summary: Get popular members
+ *     description: Fetch users who belong to the "popular member" category.
+ *     tags:
+ *       - Home
+ *     responses:
+ *       200:
+ *         description: Popular members fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                         example: 1
+ *                       first_name:
+ *                         type: string
+ *                         example: Ayush
+ *                       last_name:
+ *                         type: string
+ *                         example: Sharma
+ *                       date_of_birth:
+ *                         type: string
+ *                         format: date
+ *                         example: 1997-03-10
+ *                       upload_selfie:
+ *                         type: string
+ *                         example: uploads/selfie789.jpg
+ *                       created_at:
+ *                         type: string
+ *                         format: date-time
+ *                         example: 2024-12-05T14:20:00Z
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Internal server error
+ */
+
+router.get("/PopularMembers" , getPopularMembers)
+
+
+/**
+ * @swagger
+ * /ReadyToInteract:
+ *   get:
+ *     summary: Get ready to interact users
+ *     description: Fetch users who belong to the "ready to interact" category.
+ *     tags:
+ *       - Home
+ *     responses:
+ *       200:
+ *         description: Ready to interact users fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                         example: 1
+ *                       first_name:
+ *                         type: string
+ *                         example: Ayush
+ *                       last_name:
+ *                         type: string
+ *                         example: Sharma
+ *                       date_of_birth:
+ *                         type: string
+ *                         format: date
+ *                         example: 1998-04-15
+ *                       upload_selfie:
+ *                         type: string
+ *                         example: uploads/selfie123.jpg
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Internal server error
+ */
+
+router.get("/ReadyToInteract" , getReadyToInteract)
 
 
 /**

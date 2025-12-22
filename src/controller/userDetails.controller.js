@@ -1,4 +1,4 @@
-import { AddPhotos, ShoutOut, UserGiveRating } from "../utils/associations.js"
+import { AddPhotos, Category, ShoutOut, UserGiveRating } from "../utils/associations.js"
 import User from "../models/user.model.js"
 import { RatingTitles } from "../utils/associations.js"
 import ReportUser from "../models/ReportUser.model.js"
@@ -41,24 +41,155 @@ const getShoutOut = async (req,res) => {
     }
 }
 
-const getNewestMember = async (req , res) => {
+const HomeScreen = async (req ,res) => {
     try {
-        
-        const NewestMember = await User.findAll({
+
+        const newestMembers = await User.findAll({
+            include: {
+                model: Category,
+                as: "categories",
+                where: { category: "newest beautiful members"},
+                attributes: []
+            },
+            attributes: ["id" , "first_name" , "last_name" , "date_of_birth" , "upload_selfie" , "created_at"],
             order: [["created_at" , "DESC"]],
-            attributes: [ "first_name" ,"profile_name" , "date_of_birth" , "height" , "weight" , "nationality"]
+            limit: 5
+        })
+        
+        const newApplicants = await User.findAll({
+            include: {
+                model: Category,
+                as: "categories",
+                where: {category: "new applicants"},
+                attributes: []
+            },
+            attributes: ["id" , "first_name" , "last_name" , "date_of_birth" , "upload_selfie" , "created_at"],
+            order: [["created_at" , "DESC"]],
+            limit: 5
         })
 
-        return res.json({
-            status: false,
-            message: "Newest Member Fetched!",
-            data: NewestMember
+        const popularMember = await User.findAll({
+            include: {
+                model: Category,
+                as: "categories",
+                where: {category: "popular member"},
+                attributes: []
+            },
+            attributes: ["id" , "first_name" , "last_name" , "date_of_birth" , "upload_selfie" , "created_at"],
+            //order: [["DESC"]],
+            limit: 5
         })
+
+        const readyToInteract = await User.findAll({
+          //  where: { isReadyToInteract: true },
+            include: {
+                model: Category,
+                as: "categories",
+                where: { category: "ready to interact" },
+                attributes: []
+            },
+            attributes: ["id", "first_name", "last_name", "date_of_birth", "upload_selfie"],
+            limit: 5
+        });
+
         
+        return res.json({
+            status: true,
+            data: {
+                "newest beautiful members": newestMembers,
+                "new applicants": newApplicants,
+                "popular members": popularMember,
+                "ready to interact": readyToInteract,
+                // "who viewed me": whoViewedMe
+            }
+        });
+
     } catch (error) {
         return res.json({status: false , message: error.message})
     }
 }
+
+const getNewestBeautifulMembers = async (req, res) => {
+  try {
+    const users = await User.findAll({
+      include: {
+        model: Category,
+        as: "categories",
+        where: { category: "newest beautiful members" },
+        attributes: []
+      },
+
+      attributes: ["id" , "first_name" , "last_name" , "date_of_birth" , "upload_selfie","created_at"],
+      order: [["created_at", "DESC"]],
+    });
+
+    return res.json({status: true , data: users});
+
+  } catch (error) {
+    return res.json({status: false,message: error.message});
+  }
+};
+
+ const getNewApplicants = async (req, res) => {
+  try {
+    const users = await User.findAll({
+      include: {
+        model: Category,
+        as: "categories",
+        where: { category: "new applicants" },
+        attributes: []
+      },
+      attributes: ["id" , "first_name" , "last_name" , "date_of_birth" , "upload_selfie","created_at"],
+      order: [["created_at", "DESC"]],
+      limit: 5
+    });
+
+    return res.json({status: true , data: users});
+  } catch (error) {
+    return res.json({status: false,message: error.message});
+  }
+};
+
+ const getPopularMembers = async (req, res) => {
+  try {
+    const users = await User.findAll({
+
+      include: {
+        model: Category,
+        as: "categories",
+        where: { category: "popular member" },
+        attributes: []
+      },
+      attributes: ["id","first_name","last_name","date_of_birth","upload_selfie","created_at"],
+      limit: 5
+    });
+
+    return res.json({status: true,data: users});
+  } catch (error) {
+    return res.json({status: false , message: error.message});
+  }
+};
+
+const getReadyToInteract = async (req, res) => {
+  try {
+    const users = await User.findAll({
+      include: {
+        model: Category,
+        as: "categories",
+        where: { category: "ready to interact" },
+        attributes: []
+      },
+      attributes: ["id","first_name","last_name","date_of_birth","upload_selfie"],
+      order: [["created_at", "DESC"]],
+      limit: 5
+    });
+
+    return res.json({status: true,data: users});
+
+  } catch (error) {
+    return res.json({status: false, message: error.message});
+  }
+};
 
 const AddRatingsTitles = async (req, res) => {
     try {
@@ -154,7 +285,6 @@ const getUserRatings = async (req ,res) => {
         return res.json({status: false , message: error.message})
     }
 }
-
 
 const reportUser = async (req ,res) => {
     try {
@@ -291,12 +421,16 @@ const getUploadedPrivatePhotos = async (req ,res) => {
 
 export {
     getShoutOut,
-    getNewestMember,
     AddRatingsTitles,
     giveRating,
     getUserRatings,
     reportUser,
     blockUser,
     getUploadedPhotos,
-    getUploadedPrivatePhotos
+    getUploadedPrivatePhotos,
+    HomeScreen,
+    getNewestBeautifulMembers,
+    getNewApplicants,
+    getReadyToInteract,
+    getPopularMembers,
 }
