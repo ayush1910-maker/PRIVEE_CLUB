@@ -113,7 +113,7 @@ router.get("/homeScreen", HomeScreen);
 
 /**
  * @swagger
- * /NewestBeautifulMembers:
+ * /api/v1/userDetails/NewestBeautifulMembers:
  *   get:
  *     summary: Get newest beautiful members
  *     description: Fetch all users who belong to the "newest beautiful members" category, ordered by newest first.
@@ -174,7 +174,7 @@ router.get("/NewestBeautifulMembers" , getNewestBeautifulMembers)
 
 /**
  * @swagger
- * /NewApplicants:
+ * /api/v1/userDetails/NewApplicants:
  *   get:
  *     summary: Get new applicants
  *     description: Fetch the latest users who belong to the "new applicants" category.
@@ -236,7 +236,7 @@ router.get("NewApplicants" , getNewApplicants)
 
 /**
  * @swagger
- * /PopularMembers:
+ * /api/v1/userDetails/PopularMembers:
  *   get:
  *     summary: Get popular members
  *     description: Fetch users who belong to the "popular member" category.
@@ -298,7 +298,7 @@ router.get("/PopularMembers" , getPopularMembers)
 
 /**
  * @swagger
- * /ReadyToInteract:
+ * /api/v1/userDetails/ReadyToInteract:
  *   get:
  *     summary: Get ready to interact users
  *     description: Fetch users who belong to the "ready to interact" category.
