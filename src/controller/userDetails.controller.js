@@ -364,6 +364,30 @@ const blockUser = async (req ,res) => {
     }
 }
 
+const unBlockUser = async (req ,res) => {
+    try {
+
+        const user_id = req.user.id
+        const {blocked_user_id} = req.body
+
+        const deleted = await BlockUser.destroy({
+            where: {user_id , blocked_user_id}
+        })
+
+        if (!deleted) {
+            return res.json({status: false , message: "User was not blocked"})
+        }
+
+        return res.json({
+            status: true,
+            message: "User Unblocked successfully"
+        })
+        
+    } catch (error) {
+        return res.json({status: false , message: error.message})
+    }
+}
+
 const getUploadedPhotos = async (req ,res) => {
     try {
         const user_id = req.user.id 
@@ -426,6 +450,7 @@ export {
     getUserRatings,
     reportUser,
     blockUser,
+    unBlockUser,
     getUploadedPhotos,
     getUploadedPrivatePhotos,
     HomeScreen,

@@ -1,7 +1,7 @@
 import express from "express"
 import Joi from "joi"
 import { validate } from "../utils/validate.js"
-import { AddRatingsTitles, blockUser, getNewApplicants, getNewestBeautifulMembers, getPopularMembers, getReadyToInteract, getShoutOut, getUploadedPhotos, getUploadedPrivatePhotos, getUserRatings, giveRating, HomeScreen, reportUser } from "../controller/userDetails.controller.js"
+import { AddRatingsTitles, blockUser, getNewApplicants, getNewestBeautifulMembers, getPopularMembers, getReadyToInteract, getShoutOut, getUploadedPhotos, getUploadedPrivatePhotos, getUserRatings, giveRating, HomeScreen, reportUser, unBlockUser } from "../controller/userDetails.controller.js"
 import verifyJWT from "../middlewares/auth.middleware.js"
 
 
@@ -703,6 +703,59 @@ router.post("/report" , validate(Joi.object({
  */
 
 router.post("/block" , verifyJWT , blockUser)
+
+/**
+ * @swagger
+ * /api/v1/userBlocking/unblockUser:
+ *   post:
+ *     tags:
+ *       - User Details
+ *     summary: Unblock a user
+ *     description: Allows a logged-in user to unblock a previously blocked user.
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - blocked_user_id
+ *             properties:
+ *               blocked_user_id:
+ *                 type: integer
+ *                 example: 2
+ *     responses:
+ *       200:
+ *         description: User unblocked successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "User Unblocked successfully"
+ *       400:
+ *         description: User was not blocked or request invalid
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "User was not blocked"
+ */
+
+router.post("/unblockUser" ,verifyJWT, unBlockUser)
 
 
 /**
