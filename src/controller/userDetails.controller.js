@@ -96,10 +96,10 @@ const HomeScreen = async (req ,res) => {
         return res.json({
             status: true,
             data: {
-                "newest beautiful members": newestMembers,
-                "new applicants": newApplicants,
-                "popular members": popularMember,
-                "ready to interact": readyToInteract,
+                "newestBeautifulMembers": newestMembers,
+                "newApplicants": newApplicants,
+                "popularMembers": popularMember,
+                "readyToInteract": readyToInteract,
                 // "who viewed me": whoViewedMe
             }
         });

@@ -60,7 +60,7 @@ router.get("/getShoutOut" , getShoutOut)
  * /api/v1/userDetails/homeScreen:
  *   get:
  *     summary: Home screen data
- *     description: Fetches categorized user lists for the home screen such as newest members, new applicants, popular members, and ready-to-interact users.
+ *     description: Fetches categorized user lists for the home screen
  *     tags:
  *       - Home
  *     responses:
@@ -77,22 +77,85 @@ router.get("/getShoutOut" , getShoutOut)
  *                 data:
  *                   type: object
  *                   properties:
- *                     newest beautiful members:
+ *                     newestBeautifulMembers:
  *                       type: array
  *                       items:
- *                         $ref: '#/components/schemas/HomeUser'
- *                     new applicants:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: integer
+ *                             example: 1
+ *                           first_name:
+ *                             type: string
+ *                             example: Ayush
+ *                           last_name:
+ *                             type: string
+ *                             example: Sharma
+ *                           date_of_birth:
+ *                             type: string
+ *                             format: date
+ *                             example: "1999-08-15"
+ *                           upload_selfie:
+ *                             type: string
+ *                             example: "https://example.com/selfie.jpg"
+ *                           created_at:
+ *                             type: string
+ *                             format: date-time
+ *                             example: "2025-01-01T10:30:00Z"
+ *
+ *                     newApplicants:
  *                       type: array
  *                       items:
- *                         $ref: '#/components/schemas/HomeUser'
- *                     popular members:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: integer
+ *                             example: 2
+ *                           first_name:
+ *                             type: string
+ *                           last_name:
+ *                             type: string
+ *                           date_of_birth:
+ *                             type: string
+ *                           upload_selfie:
+ *                             type: string
+ *                           created_at:
+ *                             type: string
+ *
+ *                     popularMembers:
  *                       type: array
  *                       items:
- *                         $ref: '#/components/schemas/HomeUser'
- *                     ready to interact:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: integer
+ *                           first_name:
+ *                             type: string
+ *                           last_name:
+ *                             type: string
+ *                           date_of_birth:
+ *                             type: string
+ *                           upload_selfie:
+ *                             type: string
+ *                           created_at:
+ *                             type: string
+ *
+ *                     readyToInteract:
  *                       type: array
  *                       items:
- *                         $ref: '#/components/schemas/HomeUser'
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: integer
+ *                           first_name:
+ *                             type: string
+ *                           last_name:
+ *                             type: string
+ *                           date_of_birth:
+ *                             type: string
+ *                           upload_selfie:
+ *                             type: string
+ *
  *       500:
  *         description: Server error
  *         content:
