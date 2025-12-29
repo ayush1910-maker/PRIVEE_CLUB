@@ -6,7 +6,7 @@ import verifyJWT from "../middlewares/auth.middleware.js"
 import userInfoSchema from "../utils/schemas/userInfoSchemas.js"
 
 
-import { choose_looking_for, forget_password, get_lookingfor_list, get_user_looking_for, hear_about, intrested_in, login, register_user, reset_password, select_gender, upload_selfie, user_info, verify_otp } from "../controller/user.controller.js";
+import { choose_looking_for, forget_password, get_lookingfor_list, get_user_looking_for, hear_about, intrested_in, login, register_user, reset_password, select_gender, social_login, upload_selfie, user_info, verify_otp } from "../controller/user.controller.js";
 
 
 const router = express.Router()
@@ -155,6 +155,107 @@ router.post("/login-user" ,validate(Joi.object({
     email: Joi.string().email().required(),
     password: Joi.string().min(6).required()
 })) ,  login)
+
+
+/**
+ * @swagger
+ * /api/v1/users/socialLogin:
+ *   post:
+ *     tags:
+ *       - User 
+ *     summary: Social login for users
+ *     description: Allows a user to log in using Google, Facebook, or Apple. Updates device info and FCM token if provided.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - social_id
+ *               - login_type
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: user@example.com
+ *               social_id:
+ *                 type: string
+ *                 example: "1234567890abcdef"
+ *               login_type:
+ *                 type: string
+ *                 enum: [google, facebook, apple]
+ *                 example: google
+ *               device_type:
+ *                 type: string
+ *                 example: android
+ *               device_token:
+ *                 type: string
+ *                 example: "fcm_token_here"
+ *     responses:
+ *       200:
+ *         description: Login successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "google Login Successfully"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     token:
+ *                       type: string
+ *                       example: "jwt_access_token_here"
+ *                     user:
+ *                       type: object
+ *                       properties:
+ *                         id:
+ *                           type: integer
+ *                           example: 1
+ *                         email:
+ *                           type: string
+ *                           example: "user@example.com"
+ *                         social_id:
+ *                           type: string
+ *                           example: "1234567890abcdef"
+ *                         login_type:
+ *                           type: string
+ *                           example: "google"
+ *                         device_type:
+ *                           type: string
+ *                           example: "android"
+ *                         fcm_token:
+ *                           type: string
+ *                           example: "fcm_token_here"
+ *       400:
+ *         description: User not found or invalid input
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "User not found"
+ */
+
+router.post("/socialLogin" , validate(Joi.object({
+    email: Joi.string().email().required(),
+    social_id: Joi.string().required(),
+    login_type: Joi.string().valid("google" , "facebook" , "apple").required(),
+    device_type: Joi.string().optional(),
+    device_token: Joi.string().optional()
+})), social_login)
 
 
 /**
