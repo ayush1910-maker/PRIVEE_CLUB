@@ -9,29 +9,32 @@ const User = sequelize.define("user" ,
             primaryKey: true,
             autoIncrement: true
         },
+        googleId: {
+            type: DataTypes.STRING,
+        },
         first_name: {
             type: DataTypes.STRING,
-            allowNull: false
+            // allowNull: false
         },
         last_name: {
             type: DataTypes.STRING,
-            allowNull: true
+            // allowNull: true
         },
         profile_name: {
             type: DataTypes.STRING,
-            allowNull: false
+            // allowNull: false
         },
         email: {
             type: DataTypes.STRING,
-            allowNull: false
+            // allowNull: false
         },
         mobile_number: {
             type: DataTypes.STRING,
-            allowNull: false
+            // allowNull: false
         },
         password: {
             type: DataTypes.STRING,
-            allowNull: false
+            // allowNull: false
         },
         upload_selfie: {
             type: DataTypes.STRING,
@@ -183,7 +186,21 @@ const User = sequelize.define("user" ,
         force_logged_out: {
            type: DataTypes.BOOLEAN,
            defaultValue: false
+        },
+
+        fcm_token: {
+            type: DataTypes.TEXT
+        },
+        login_type: {
+            type: DataTypes.STRING
+        },
+        social_id: {
+            type: DataTypes.STRING
+        },
+        device_type: {
+            type: DataTypes.STRING
         }
+        
     },
     
     {
