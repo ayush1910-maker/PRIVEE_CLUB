@@ -9,6 +9,7 @@ import UserGiveRating from "../models/usergiveRating.model.js";
 import BlockUser from "../models/BlockUser.model.js";
 import UserCategory from "../models/UserCategory.model.js";
 import Category from "../models/Category.model.js";
+import Messages from "../models/messages.model.js";
 
 User.hasMany(AddPhotos, {
     foreignKey: "user_id",
@@ -121,6 +122,29 @@ Category.belongsToMany(User, {
     otherKey: "user_id",
     as: "users"
 });
+
+
+Messages.belongsTo(User, {
+  foreignKey: "sender_id",
+  as: "sender"
+})
+
+Messages.belongsTo(User, {
+  foreignKey: "receiver_id",
+  as: "receiver"
+})
+
+
+User.hasMany(Messages, {
+  foreignKey: "sender_id",
+  as: "sentMessages"
+})
+
+User.hasMany(Messages, {
+  foreignKey: "receiver_id",
+  as: "receivedMessages"
+})
+
 
 
 export {
