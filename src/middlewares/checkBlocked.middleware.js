@@ -26,7 +26,7 @@ const checkBlocked = async (req , res , next) => {
         })
 
         if (blockExists) {
-            return res.json({status: false , message: error.message})
+            return res.json({status: false , message: "you are blocked! by User"})
         }
 
         next();
