@@ -17,7 +17,11 @@ import editProfile from './src/routes/editProfile.route.js'
 import lookingFor from './src/routes/lookingFor.route.js';
 import userDetails from './src/routes/userDetails.route.js'
 import adminRouter from './src/routes/admin.route.js'
+import messageRouter from './src/routes/messages.route.js'
 
+
+import passport from './src/utils/Passport.js';
+import authRoutes from './src/routes/googleAuth.route.js'
 
 const app = express();
 
@@ -43,6 +47,10 @@ app.use("/api/v1/editProfile" , editProfile)
 app.use("/api/v1/lookingFor" , lookingFor)
 app.use("/api/v1/userDetails" , userDetails)
 app.use("/api/v1/admin" , adminRouter)
+app.use("/api/v1/messages" , messageRouter)
+
+app.use(passport.initialize())
+app.use("/api/v1/auth" , authRoutes)
 
 
 // database connectivity
