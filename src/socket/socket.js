@@ -35,7 +35,12 @@ io.on('connection' , (socket)=>{
 
 
     io.emit("getOnlineUsers" , Object.keys(userSocketmap))
-    // sab connected user ko btayaga kon kon user online hai 
+    // sab connected user ko btayaga kon kon user online hai
+    // emit -> send event to all connected sockets
+
+    socket.on("typing" , ({senderId , receiverId}) => {
+        io.to(getReceiverSocketId(receiverId)).emit("userTyping" , senderId)
+    })
 
     socket.on('disconnect' , () => {
 
