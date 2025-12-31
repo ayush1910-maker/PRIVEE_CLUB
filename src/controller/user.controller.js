@@ -90,6 +90,7 @@ const login = async (req,res) => {
 
         await User.update(
             {
+                last_login_at: new Date(),
                 force_logged_out: false
             },
             {

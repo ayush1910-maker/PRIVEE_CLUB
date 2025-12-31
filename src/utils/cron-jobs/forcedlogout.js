@@ -17,7 +17,7 @@ cron.schedule("*/15 * * * *", async () => {
             {
                 where: {
                     rating_score: {[Op.lt]: 4},
-                    created_at: { [Op.lte]: cutoffTime },
+                    last_login_at: { [Op.lte]: cutoffTime },
                     force_logged_out: false
                 }
             }

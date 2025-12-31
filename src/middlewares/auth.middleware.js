@@ -5,8 +5,7 @@ import jwt from "jsonwebtoken";
 const verifyJWT = async (req, res, next) => {
   try {
     let token = null;
-
-    // Extract token from cookies or Authorization header
+    
     if (req.cookies?.accessToken) {
       token = req.cookies.accessToken;
     } else if (req.header("Authorization")) {
@@ -33,7 +32,15 @@ const verifyJWT = async (req, res, next) => {
     });
 
     if (!dbUser) {
-      throw new ApiError(400, "Customer not found or invalid token");
+      throw new ApiError(401, "User not found");
+    }
+
+    
+    if (dbUser.force_logged_out) {
+      throw new ApiError(
+        401,
+        "Session expired due to account restrictions. Please login again."
+      );
     }
 
     
@@ -41,12 +48,32 @@ const verifyJWT = async (req, res, next) => {
       throw new ApiError(401, "Token is no longer valid. Please login again.");
     }
 
+    
     req.user = dbUser;
     next();
 
   } catch (err) {
     console.error("JWT Verification Error:", err.message);
-    return res.status(401).json({ status: false, message: err.message });
+
+    
+    if (err.name === "TokenExpiredError") {
+      return res.status(401).json({
+        status: false,
+        message: "Token expired. Please login again."
+      });
+    }
+
+    if (err.name === "JsonWebTokenError") {
+      return res.status(401).json({
+        status: false,
+        message: "Invalid token. Please login again."
+      });
+    }
+
+    return res.status(err.statusCode || 401).json({
+      status: false,
+      message: err.message || "Unauthorized"
+    });
   }
 };
 

@@ -187,6 +187,9 @@ const User = sequelize.define("user" ,
            type: DataTypes.BOOLEAN,
            defaultValue: false
         },
+        last_login_at: {
+            type: DataTypes.DATE,
+        },
 
         fcm_token: {
             type: DataTypes.TEXT
