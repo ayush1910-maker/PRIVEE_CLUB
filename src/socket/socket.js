@@ -1,56 +1,116 @@
 import { Server } from "socket.io";
-import http from "http"
-import express from "express"
+import Messages from "../models/messages.model.js";
 
-const app = express()
+let io; 
+const userSocketMap = new Map(); 
 
-const server = http.createServer(app)
+export const initSocket = (server) => {
 
-const io = new Server(server , {
+  io = new Server(server, {
     cors: {
-        origin: [],
-        methods:["GET" , "POST"]
+      origin: "*",
+      methods: ["GET", "POST"]
     }
-})
-// socket.io server start kra
-// cors allow kre
+  });
+
+  io.on("connection", (socket) => {
+    
+    const userId = socket.handshake.query.userId;
+
+    console.log("User Connected: ", socket.id);
+
+    socket.on("join_chat" , async ({sender_id , receiver_id}) => {
+        try {
+        const roomId =
+          Number(sender_id) < Number(receiver_id)
+            ? `${sender_id}_${receiver_id}`
+            : `${receiver_id}_${sender_id}`;
+
+        socket.join(roomId);
+
+        const messages = await Messages.findAll({
+          where: {
+            [Op.or]: [
+              { sender_id, receiver_id },
+              { sender_id: receiver_id, receiver_id: sender_id },
+            ],
+          },
+          order: [["createdAt", "ASC"]],
+        });
+
+        socket.emit("chat_history", messages);
+
+        await Messages.update(
+          { is_read: true },
+          {
+            where: {
+              sender_id: receiver_id,
+              receiver_id: sender_id,
+              is_read: false,
+            },
+          }
+        );
+
+        const receiverSocketId = userSocketMap.get(String(receiver_id));
+        if (receiverSocketId) {
+          io.to(receiverSocketId).emit("user_joined", { userId: sender_id });
+        }
+            
+        } catch (error) {
+            socket.emit("message_error", {
+                error: "Message sending failed",
+            });
+        }
+    })
+    
+    userSocketMap.set(String(userId), socket.id);
+    
+    io.emit("getOnlineUsers", Array.from(userSocketMap.keys()));
+
+    socket.on("send_message", async ({ sender_id, receiver_id, content }) => {
+        try {
+            const message = await Messages.create({
+                sender_id,
+                receiver_id,
+                content,
+                is_read: false,
+            });
+
+            socket.emit("message_received", {
+                id: message.id,
+                sender_id,
+                receiver_id,
+                content,
+                created_at: message.created_at,
+            });
+
+        } catch (error) {
+            console.error("Message send error:", error);
+            socket.emit("message_error", {
+            error: "Message sending failed",
+        });
+    }
+    });
+
+
+    socket.on("typing", ({ senderId, receiverId }) => {
+      const receiverSocketId = userSocketMap.get(String(receiverId));
+      if (receiverSocketId) {
+        io.to(receiverSocketId).emit("userTyping", senderId);
+      }
+    });
+
+    socket.on("disconnect", () => {
+      userSocketMap.delete(String(userId));
+
+      io.emit("getOnlineUsers", Array.from(userSocketMap.keys()));
+    });
+  });
+
+  return io;
+};
+
 
 export const getReceiverSocketId = (receiverId) => {
-    return userSocketmap[receiverId]
-}
-//Agar kisi specific user ko message bhejna ho
-//Uska socketId yaha se milega 
-
-const userSocketmap = {}
-//Ye object userId → socketId ka record store karega
-
-io.on('connection' , (socket)=>{
-    const userId = socket.handshake.query.userId;
-    // url 
-
-    if (userId !== "undefine") {
-        userSocketmap[userId] = socket.id
-    }
-    // agar user valid hoga to uska userId store kar dega
-
-
-    io.emit("getOnlineUsers" , Object.keys(userSocketmap))
-    // sab connected user ko btayaga kon kon user online hai
-    // emit -> send event to all connected sockets
-
-    socket.on("typing" , ({senderId , receiverId}) => {
-        io.to(getReceiverSocketId(receiverId)).emit("userTyping" , senderId)
-    })
-
-    socket.on('disconnect' , () => {
-
-        delete userSocketmap[userId],
-        // if user disconnect remove its userId. 
-
-        io.emit("getOnlineUsers" , Object.keys(userSocketmap))
-        // sab connected user ko btayage kon kon user online hai
-
-    })
-})
-
-export {io , app , server}
+  return userSocketMap.get(String(receiverId));
+};
