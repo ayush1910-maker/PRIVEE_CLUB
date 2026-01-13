@@ -10,6 +10,7 @@ import BlockUser from "../models/BlockUser.model.js";
 import UserCategory from "../models/UserCategory.model.js";
 import Category from "../models/Category.model.js";
 import Messages from "../models/messages.model.js";
+import Request from "../models/Request.model.js";
 
 User.hasMany(AddPhotos, {
     foreignKey: "user_id",
@@ -145,6 +146,15 @@ User.hasMany(Messages, {
   as: "receivedMessages"
 })
 
+Request.belongsTo(User, {
+  foreignKey: "sender_id",
+  as: "sender",
+});
+
+Request.belongsTo(User, {
+  foreignKey: "receiver_id",
+  as: "receiver",
+});
 
 
 export {
@@ -158,5 +168,6 @@ export {
     RatingTitles,
     BlockUser,
     Category,
-    UserCategory
+    UserCategory,
+    Request
 };
