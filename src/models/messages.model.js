@@ -32,23 +32,6 @@ const Messages = sequelize.define("message",
             type: DataTypes.TEXT,
             allowNull: false,
         },
-        message_type: {
-            type: DataTypes.ENUM("text" , "image" , "file"),
-            allowNull: false,
-            defaultValue: "text"
-        },
-        file_url: {
-            type: DataTypes.TEXT
-        },
-        file_name: {
-            type: DataTypes.STRING
-        },
-        mime_type: {
-            type: DataTypes.STRING
-        },
-        file_size: {
-            type: DataTypes.STRING
-        },
         is_read: {
             type: DataTypes.BOOLEAN,
             defaultValue: false,
