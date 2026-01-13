@@ -3,7 +3,8 @@ import User from "../models/user.model.js"
 import { RatingTitles } from "../utils/associations.js"
 import ReportUser from "../models/ReportUser.model.js"
 import { BlockUser } from "../utils/associations.js"
-import { Op } from "sequelize"
+import { Op  ,fn , col} from "sequelize"
+import Request from "../models/Request.model.js"
 
 
 const getShoutOut = async (req,res) => {
@@ -441,6 +442,160 @@ const getUploadedPrivatePhotos = async (req ,res) => {
     }
 }
 
+const sendRequestPrivateAccess = async (req ,res) => {
+    try {
+        const sender_id = req.user.id
+        const {receiver_id} = req.body
+
+        const receiverId = await User.findByPk(receiver_id)
+        if (!receiverId) {
+            return res.json({status: false , message: "receiverId are not found"})
+        }
+        
+        if (sender_id === receiver_id ) {
+            return res.json({status: false , message: "sender and receiver are same"})
+        }
+
+        const existingRequest = await Request.findOne({
+            where: {
+                [Op.or]: [
+                    {sender_id , receiver_id},
+                    {sender_id: receiver_id , receiver_id: sender_id}
+                ]
+            }
+        })
+
+        if (existingRequest) {
+            return res.json({status: false , message: "you already send request"})
+        }
+
+        const request = await Request.create({
+            sender_id,
+            receiver_id,
+            status: "Pending Request"
+        })
+
+        return res.json({
+            status: true,
+            message: "Request send successfully",
+            data: request
+        })
+ 
+    } catch (error) {
+        return res.json({status: false , message: error.message})
+    }
+}
+
+const getRecievedRequests = async (req ,res) => {
+    try {
+        const user_id = req.user.id
+
+        const user = await User.findByPk(user_id)
+        if(!user){
+            return res.json({status: false , message: "User not found"})
+        }
+
+        const FindRequest = await Request.findAll({
+            where: {receiver_id: req.user.id},
+            include: [
+                { 
+                    model: User,
+                    as: "sender",
+                    attributes: ["first_name" , "last_name" , "upload_selfie"]
+                },
+            ],
+            order: [["created_at" , "DESC"]]
+        })
+
+        return res.json({
+            status: true,
+            message: "request fetched successfully",
+            data: FindRequest
+        })
+        
+    } catch (error) {
+        console.log(error);
+        return res.json({status: false , message: error.message})
+    }
+}
+
+const AcceptRequest = async (req ,res) => {
+    try {
+
+        const user_id = req.user.id
+        const { request_id } = req.body
+
+        const requestId = await User.findByPk(request_id)
+
+        if (!requestId) {
+            return res.json({status: false , message: "User not found"})
+        }
+
+        const request = await Request.findOne({
+            where: {
+                sender_id: request_id,
+                receiver_id: user_id,
+                status: "Pending Request"
+            }
+        })
+
+        if (!request) {
+            return res.json({status: false , message: "request not found"})
+        }
+
+        request.status = "Confirmed Request"
+        await request.save()
+        
+        return res.json({
+            status: true,
+            message: "request Accepted",
+            data: request
+        })
+
+    } catch (error) {
+        console.log(error);
+        return res.json({status: false , message: error.message})
+    }
+}
+
+const RejectRequest = async (req, res) => {
+    try {
+
+        const receiver_id = req.user.id
+
+        const {request_id} = req.body
+
+        const requestId = await User.findByPk(request_id)
+
+        if (!requestId) {
+            return res.json({status: false , message: "user not found"})
+        }
+
+        const request = await Request.findOne({
+            where: {
+                sender_id: request_id,
+                receiver_id,
+                status: "Pending Request"
+            }
+        })
+
+        if (!request) {
+            return res.json({status: false , message: "request not found"})
+        }
+
+        await request.destroy()
+
+        return res.json({
+            status: true,
+            message: "request reject successfully",
+            data: request
+        })
+        
+    } catch (error) {
+        console.log(error);
+        return res.json({status: false , message: error.message})
+    }
+}
 
 
 export {
@@ -458,4 +613,10 @@ export {
     getNewApplicants,
     getReadyToInteract,
     getPopularMembers,
+
+    sendRequestPrivateAccess,
+    getRecievedRequests,
+    AcceptRequest,
+    RejectRequest
+
 }
