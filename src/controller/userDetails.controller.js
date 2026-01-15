@@ -3,7 +3,7 @@ import User from "../models/user.model.js"
 import { RatingTitles } from "../utils/associations.js"
 import ReportUser from "../models/ReportUser.model.js"
 import { BlockUser } from "../utils/associations.js"
-import { Op  ,fn , col} from "sequelize"
+import { Op  ,fn , col, Model} from "sequelize"
 import Request from "../models/Request.model.js"
 
 
@@ -496,7 +496,7 @@ const getRecievedRequests = async (req ,res) => {
         }
 
         const FindRequest = await Request.findAll({
-            where: {receiver_id: req.user.id},
+            where: {receiver_id: req.user.id , status: "Pending Request"},
             include: [
                 { 
                     model: User,
@@ -597,6 +597,77 @@ const RejectRequest = async (req, res) => {
     }
 }
 
+const getConfirmedRequest = async (req ,res) => {
+    try {
+
+        const user_id = req.user.id
+
+        const ConfirmedRequests = await Request.findAll({
+            where: {receiver_id: user_id , status: "Confirmed Request"},
+            include: [
+                {
+                    model: User,
+                    as: "sender",
+                    attributes: ["first_name" , "last_name" , "upload_selfie"],
+                },
+            ],
+            order: [["created_at" , "DESC"]]
+        })
+
+        return res.json({
+            status: true,
+            message: "ConfirmedRequests Fetched!",
+            data: ConfirmedRequests
+        })
+        
+    } catch (error) {
+        console.log(error);
+        return res.json({status: false , message: error.message})
+    }
+}
+
+const deleteConfirmedRequest = async (req , res) => {
+    try {
+
+        const user_id = req.user.id
+
+        const {request_id} = req.body
+
+        const requestId = await User.findByPk(request_id)
+        if (!requestId) {
+            return res.json({status: false , message: "requested user not found"})
+        }
+
+        const deleteRequest = await Request.findOne({
+            where: {
+                sender_id: request_id,
+                receiver_id: user_id ,
+                status: "Confirmed Request",
+            },
+            include: [
+                {
+                    model: User,
+                    as: "sender",
+                    attributes: ["first_name" , "last_name" , "upload_selfie" ]
+                }
+            ]
+        })
+
+        await deleteRequest.destroy()
+
+        return res.json({
+            status: true,
+            message: "User remove from freind list",
+            data: deleteRequest
+        })
+
+
+        
+    } catch (error) {
+        console.log(error);
+        return res.json({status: false , message: error.message})
+    }
+}
 
 export {
     getShoutOut,
@@ -617,6 +688,8 @@ export {
     sendRequestPrivateAccess,
     getRecievedRequests,
     AcceptRequest,
-    RejectRequest
+    RejectRequest,
+    getConfirmedRequest,
+    deleteConfirmedRequest
 
 }

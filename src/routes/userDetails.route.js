@@ -1,7 +1,7 @@
 import express from "express"
 import Joi from "joi"
 import { validate } from "../utils/validate.js"
-import { AcceptRequest, AddRatingsTitles, blockUser, getNewApplicants, getNewestBeautifulMembers, getPopularMembers, getReadyToInteract, getRecievedRequests, getShoutOut, getUploadedPhotos, getUploadedPrivatePhotos, getUserRatings, giveRating, HomeScreen, RejectRequest, reportUser, sendRequestPrivateAccess, unBlockUser } from "../controller/userDetails.controller.js"
+import { AcceptRequest, AddRatingsTitles, blockUser, deleteConfirmedRequest, getConfirmedRequest, getNewApplicants, getNewestBeautifulMembers, getPopularMembers, getReadyToInteract, getRecievedRequests, getShoutOut, getUploadedPhotos, getUploadedPrivatePhotos, getUserRatings, giveRating, HomeScreen, RejectRequest, reportUser, sendRequestPrivateAccess, unBlockUser } from "../controller/userDetails.controller.js"
 import verifyJWT from "../middlewares/auth.middleware.js"
 
 
@@ -850,4 +850,9 @@ router.get("/getRecievedRequests" , verifyJWT , getRecievedRequests)
 router.post("/AcceptRequest" , verifyJWT , AcceptRequest)
 
 router.post("/RejectRequest" , verifyJWT , RejectRequest)
+
+router.get("/getConfirmedRequest" , verifyJWT , getConfirmedRequest)
+
+router.delete("/deleteConfirmedRequest" , verifyJWT , deleteConfirmedRequest)
+
 export default router
