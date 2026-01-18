@@ -94,12 +94,24 @@ export const initSocket = (server) => {
 
 
     // send message events
-    socket.on("send_message", async ({ sender_id, receiver_id, content }) => {
+    socket.on("send_message", async ({
+      sender_id,
+      receiver_id,
+      content = null,
+      file_url = null,
+      file_name = null,
+      file_size = null,
+      message_type = "text"
+     }) => {
         try {
             const message = await Messages.create({
                 sender_id,
                 receiver_id,
                 content,
+                file_url: file_url || null,
+                file_name: file_name || null,
+                file_size: file_size || null,
+                message_type: message_type || "text",
                 is_read: false,
             });
 
@@ -108,6 +120,10 @@ export const initSocket = (server) => {
                 sender_id,
                 receiver_id,
                 content,
+                file_url,
+                file_name,
+                file_size,
+                message_type,
                 created_at: message.created_at,
             }
 
@@ -134,7 +150,7 @@ export const initSocket = (server) => {
     socket.on("typing", ({ senderId, receiverId }) => {
       const receiverSocketId = userSocketMap.get(String(receiverId));
       if (receiverSocketId) {
-        io.to(receiverSocketId).emit("userTyping", senderId);
+        io.to(receiverSocketId).emit("userTyping", { senderId });
       }
     });
 

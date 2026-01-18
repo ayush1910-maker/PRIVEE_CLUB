@@ -17,6 +17,7 @@ import editProfile from './src/routes/editProfile.route.js'
 import lookingFor from './src/routes/lookingFor.route.js';
 import userDetails from './src/routes/userDetails.route.js'
 import adminRouter from './src/routes/admin.route.js'
+import messageRouter from './src/routes/message.route.js'
 import { initSocket } from './src/socket/socket.js'
 
 
@@ -47,6 +48,7 @@ app.use("/api/v1/editProfile" , editProfile)
 app.use("/api/v1/lookingFor" , lookingFor)
 app.use("/api/v1/userDetails" , userDetails)
 app.use("/api/v1/admin" , adminRouter)
+app.use("/api/v1/message" , messageRouter)
 
 app.use(passport.initialize())
 app.use("/api/v1/auth" , authRoutes)
