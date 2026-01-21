@@ -19,6 +19,7 @@ import userDetails from './src/routes/userDetails.route.js'
 import adminRouter from './src/routes/admin.route.js'
 import messageRouter from './src/routes/message.route.js'
 import { initSocket } from './src/socket/socket.js'
+import notificationRouter from './src/routes/notification.route.js'
 
 
 import passport from './src/utils/Passport.js';
@@ -30,11 +31,20 @@ const server = createServer(app);
 
 app.use(cors());
 app.use(express.json());
-
+app.use(express.static("public"));
 
 app.get('/', (req, res) => {
     res.json({message: "Hello from the server"});
 })
+
+
+// app.post("/save-token", (req, res) => {
+//   const { token } = req.body;
+//   console.log("FCM Token received:", token);
+
+//   // Save token in DB here
+//   res.json({ success: true });
+// });
 
 // routes
 app.use("/uploads", express.static(path.join(process.cwd(), "public/temp")));
@@ -49,6 +59,7 @@ app.use("/api/v1/lookingFor" , lookingFor)
 app.use("/api/v1/userDetails" , userDetails)
 app.use("/api/v1/admin" , adminRouter)
 app.use("/api/v1/message" , messageRouter)
+app.use("/api/v1/notification" , notificationRouter)
 
 app.use(passport.initialize())
 app.use("/api/v1/auth" , authRoutes)
