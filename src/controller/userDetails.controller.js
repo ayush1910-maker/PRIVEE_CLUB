@@ -5,6 +5,7 @@ import ReportUser from "../models/ReportUser.model.js"
 import { BlockUser } from "../utils/associations.js"
 import { Op  ,fn , col, Model} from "sequelize"
 import Request from "../models/Request.model.js"
+import { sendFCMNotification } from "../utils/sendNotification.js"
 
 
 const getShoutOut = async (req,res) => {
@@ -474,6 +475,19 @@ const sendRequestPrivateAccess = async (req ,res) => {
             receiver_id,
             status: "Pending Request"
         })
+
+        const sender = await User.findByPk(sender_id)
+
+        await sendFCMNotification(
+            receiver_id,
+            "Private Access Request",
+            `${sender.first_name} sent you a request for private access`,
+            {
+                type: "Private_ACCESS_REQUEST",
+                sender_id: sender_id.toString(),
+                receiver_id: receiver_id.toString()
+            }
+        )
 
         return res.json({
             status: true,
