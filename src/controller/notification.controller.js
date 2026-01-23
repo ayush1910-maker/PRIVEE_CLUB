@@ -7,18 +7,14 @@ const saveFcmToken = async (req, res) => {
         const user_id = req.user.id
         const { fcm_token, device_type } = req.body;
 
-        if (!fcm_token) {
-            return res.json({ status: false, message: "FCM token is required" });
-        }
-
-        
         const [fcm, created] = await FCMtoken.findOrCreate({
             where: { fcm_token },
             defaults: {
-                user_id: user_id || null,        
+                user_id: user_id || null,
                 device_type: device_type || null 
             }
         });
+        console.log(created);
 
         
         if (!created) {
@@ -45,10 +41,7 @@ const saveFcmToken = async (req, res) => {
 
     } catch (error) {
         console.log(error);
-        return res.json({
-            status: false,
-            message: error.message
-        });
+        return res.json({status: false , message: error.message});
     }
 };
 

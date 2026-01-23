@@ -6,7 +6,10 @@ import verifyJWT from "../middlewares/auth.middleware.js"
 
 const router = express.Router()
 
-router.post("/save-fcm-token" ,verifyJWT,  saveFcmToken)
+router.post("/save-fcm-token" ,verifyJWT, validate(Joi.object({
+    fcm_token: Joi.string().required(),
+    device_type: Joi.string().optional()
+})),  saveFcmToken)
 
 router.get("/send-test-notification" , sendTestPushNotification)
 
