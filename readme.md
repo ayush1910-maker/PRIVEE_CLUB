@@ -37,8 +37,8 @@ project-root/
 │ │── socket/ # Socket.IO / real-time communication
 │ │── db/ # Database connection & initialization
 │ │── templates/ # Email / message templates
-│ │── index.js # Entry point: Express app + server start
 │
+│── index.js # Entry point: Express app + server start
 │── migrations/ # Sequelize migration files
 │── seeders/ # Sequelize seed files
 │── config/ # DB & environment configurations
