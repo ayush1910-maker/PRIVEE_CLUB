@@ -122,46 +122,6 @@ const login = async (req,res) => {
     }
 }
 
-const social_login = async (req, res) => {
-    try {
-
-        const {email , social_id , login_type , device_type , device_token} = req.body
-
-        let existedUser = await User.findOne({where: {email}})
-        if (!existedUser) {
-            return res.json({status: false , message: "user not found"})
-        }
-
-        await existedUser.update(
-            {
-                social_id,
-                login_type,
-                device_type: device_type || existedUser.device_type,
-                fcm_token: device_token || existedUser.fcm_token,
-            },
-            { where: {id: existedUser.id} }
-        )
-
-        const {accessToken} = await generateAccessTokens(existedUser.id)
-
-        const loggedInUser = await User.findByPk(existedUser.id , {
-            attributes: {exclude: ["password"]},
-        })
-
-        return res.json({
-            status: true,
-            message: `${login_type} Login Successfully`,
-            data: {
-                token: accessToken,
-                user: loggedInUser
-            },
-        })
-        
-    } catch (error) {
-        return res.json({status: false , message: error.message})
-    }
-}
-
 const upload_selfie = async (req, res) => {
   try {
     const user_id = req.user.id;
