@@ -513,7 +513,6 @@ export {
     generateAccessTokens,
     register_user,
     login,
-    social_login,
     upload_selfie,
     select_gender,
     get_lookingfor_list,

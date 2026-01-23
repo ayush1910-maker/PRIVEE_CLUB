@@ -6,7 +6,7 @@ import verifyJWT from "../middlewares/auth.middleware.js"
 import userInfoSchema from "../utils/schemas/userInfoSchemas.js"
 
 
-import { choose_looking_for, forget_password, get_lookingfor_list, get_user_looking_for, hear_about, intrested_in, login, register_user, reset_password, select_gender, social_login, upload_selfie, user_info, verify_otp } from "../controller/user.controller.js";
+import { choose_looking_for, forget_password, get_lookingfor_list, get_user_looking_for, hear_about, intrested_in, login, register_user, reset_password, select_gender,  upload_selfie, user_info, verify_otp } from "../controller/user.controller.js";
 
 
 const router = express.Router()
