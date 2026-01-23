@@ -26,6 +26,7 @@ A Node.js + Express.js based backend system with authentication, user management
 
 ## 📁 Folder Structure
 
+```bash
 project-root/
 │── src/
 │ │── controllers/ # API logic & request handlers
@@ -44,6 +45,7 @@ project-root/
 │── public/
 │ │── temp/ # Temporary static files / uploads
 
+```
 
 ## 🔐 Environment Variables
 
