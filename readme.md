@@ -71,17 +71,17 @@ git clone https://github.com/ayush1910-maker/PRIVEE_CLUB
 cd PRIVEE_CLUB
 
 2. Install dependencies
-bash
+```bash
 npm install
-
+```
 
 3. Setup environment variables
 Create a .env file in the root directory (refer to the Environment Variables section above).
 
 4. Run the server
-
+```bash
 npm run dev
-
+```
 
 ## 🗄 Sequelize Migration Commands
 
