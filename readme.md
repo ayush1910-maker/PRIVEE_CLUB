@@ -50,6 +50,7 @@ project-root/
 Create a `.env` file in root directory:
 
 
+```env
 PORT=8080
 DB_HOST=localhost
 DB_USER=root
@@ -58,6 +59,7 @@ DB_NAME=privee_club
 JWT_SECRET=your_secret_key
 FCM_SERVER_KEY=your_fcm_key
 
+```
 
 ## 🚀 Installation & Setup
 
@@ -85,7 +87,7 @@ npm run dev
 
 npx sequelize-cli migration:generate --name users-table
 
-Migrate single migration :-
+Migrate single migration (eg):-
 npx sequelize-cli db:migrate --to 20251117121500-create-shout-out.cjs
 
 Migrate all migrations :-
