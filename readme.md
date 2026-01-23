@@ -71,7 +71,7 @@ git clone https://github.com/ayush1910-maker/PRIVEE_CLUB
 cd PRIVEE_CLUB
 
 2. Install dependencies
-
+bash
 npm install
 
 
