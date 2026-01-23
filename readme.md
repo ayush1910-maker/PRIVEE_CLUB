@@ -86,15 +86,19 @@ npm run dev
 ## 🗄 Sequelize Migration Commands
 
 ### Generate migration
-
+```
 npx sequelize-cli migration:generate --name users-table
+```
 
 Migrate single migration (eg):-
+```
 npx sequelize-cli db:migrate --to 20251117121500-create-shout-out.cjs
+```
 
 Migrate all migrations :-
+```
 npx sequelize-cli db:migrate
-
+```
 
 ## 📬 API Documentation
 
