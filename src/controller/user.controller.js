@@ -1,5 +1,5 @@
 // import User from "../models/user.model.js"
-// import lookingFor from "../models/lookingFor.model.js";
+// import lookingFor from "../models/lookingFor.model.js";    
 // import UserLookingFor from "../models/userlookingFor.model.js";
 import {User , lookingFor , UserLookingFor} from "../utils/associations.js"
 import bcrypt from "bcrypt"
