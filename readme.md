@@ -106,6 +106,13 @@ Swagger Collection:
 http://localhost:8080/api-docs/
 
 
+## Figma Link
+```
+https://www.figma.com/design/HEry3VSh0akGoaCtyVv9v3/Dating-app?node-id=0-1&t=KloeOkrSKtX6QVKf-1
+
+```
+
+
 ## 🧠 Concepts Used
 
 - MVC Architecture
