@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Robust Real-Time Chat App</title>
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<style>
+* { box-sizing: border-box; margin:0; padding:0; }
+body {
+  font-family: "Segoe UI", sans-serif;
+  display: flex; justify-content: center; align-items: center;
+  height: 100vh; background: #e5ddd5;
+}
+.chat-container {
+  width: 400px; height: 600px;
+  display: flex; flex-direction: column;
+  background: #fff; border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+.header {
+  background: #075e54; color: #fff; padding: 15px;
+}
+.header-title { font-size: 18px; font-weight: bold; }
+.header-status { font-size: 12px; color: #d9fdd3; margin-top: 2px; }
+.messages {
+  flex: 1; padding: 12px; overflow-y: auto; background: #ece5dd;
+}
+.message {
+  max-width: 75%; padding: 8px 12px; margin-bottom: 10px;
+  border-radius: 8px; word-wrap: break-word;
+}
+.me { background: #dcf8c6; margin-left: auto; border-bottom-right-radius: 2px; }
+.other { background: #fff; margin-right: auto; border-bottom-left-radius: 2px; }
+.message img { max-width: 220px; border-radius: 8px; }
+.message a { color: #0366d6; text-decoration: none; font-weight: 500; }
+.typing { font-size: 12px; padding-left: 12px; color: #667781; height: 18px; }
+.input-box {
+  display: flex; gap: 6px; align-items: center;
+  padding: 10px; background: #f0f2f5;
+}
+input[type="text"] {
+  flex: 1; padding: 8px 12px; border-radius: 20px;
+  border: none; outline: none; background: #fff;
+}
+input[type="file"] { display: none; }
+.file-btn { cursor: pointer; font-size: 20px; }
+.send-btn {
+  background: #25d366; color: #fff; border: none;
+  border-radius: 50%; padding: 8px 14px; cursor: pointer;
+}
+.send-btn:hover { background: #128c7e; }
+</style>
+</head>
+<body>
+
+<div class="chat-container">
+  <div class="header">
+    <div class="header-title">Chat App</div>
+    <div class="header-status" id="onlineUsers"></div>
+  </div>
+
+  <div class="messages" id="messages"></div>
+  <div class="typing" id="typing"></div>
+
+  <div class="input-box">
+    <label class="file-btn">📎
+      <input type="file" id="fileInput">
+    </label>
+    <input type="text" id="messageInput" placeholder="Type a message..." oninput="typingEvent()">
+    <button class="send-btn" onclick="sendMessage()">➤</button>
+  </div>
+</div>
+
+<script>
+/* ================= CONFIG ================= */
+const API_URL = "http://localhost:8080"; // Backend API URL
+const SOCKET_URL = "http://localhost:8080"; // Socket server
+
+/* ===== TEMP USER IDS ===== */
+const sender_id = prompt("Enter your userId");
+let receiver_id = prompt("Enter receiver userId");
+
+/* ===== ELEMENTS ===== */
+const messages = document.getElementById("messages");
+const typing = document.getElementById("typing");
+const messageInput = document.getElementById("messageInput");
+const fileInput = document.getElementById("fileInput");
+const onlineUsers = document.getElementById("onlineUsers");
+
+/* ================= SOCKET ================= */
+const socket = io(SOCKET_URL, { query: { userId: sender_id } });
+
+socket.on("connect", () => {
+  console.log("Connected:", socket.id);
+  socket.emit("join_chat", { sender_id, receiver_id });
+});
+
+/* ================= SOCKET EVENTS ================= */
+socket.on("chat_history", msgs => {
+  messages.innerHTML = "";
+  msgs.forEach(msg => renderMessage(msg, msg.sender_id === sender_id));
+});
+
+socket.on("message_received", msg => renderMessage(msg, msg.sender_id === sender_id));
+
+socket.on("userTyping", ({ senderId }) => {
+  if(senderId === receiver_id){ 
+    typing.innerText = "Typing...";
+    clearTimeout(typing.timeout);
+    typing.timeout = setTimeout(() => { typing.innerText = ""; }, 1500);
+  }
+});
+
+socket.on("getOnlineUsers", users => {
+  onlineUsers.innerText = "Online: " + users.join(", ");
+});
+
+socket.on("message_error", err => alert(err.error || "Message sending failed"));
+
+/* ================= FUNCTIONS ================= */
+function renderMessage(msg, isMe) {
+  const div = document.createElement("div");
+  div.className = "message " + (isMe ? "me" : "other");
+
+  if(msg.message_type === "text") div.innerText = msg.content;
+  else if(msg.message_type === "image") div.innerHTML = `<img src="${API_URL}${msg.file_url}">`;
+  else if(msg.message_type === "file") div.innerHTML = `<a href="${API_URL}${msg.file_url}" download>📎 ${msg.file_name}</a>`;
+
+  messages.appendChild(div);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+async function uploadFile(file) {
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const res = await fetch(`${API_URL}/api/v1/message/UploadFiles`, {
+      method: "POST",
+      body: formData
+    });
+
+    if (!res.ok) throw new Error("Upload failed with status " + res.status);
+    const data = await res.json();
+
+    if (!data.file_url) throw new Error("Backend did not return file_url");
+
+    return data;
+  } catch (err) {
+    console.error(err);
+    alert("File upload failed: " + err.message);
+    return {};
+  }
+}
+
+async function sendMessage() {
+  const text = messageInput.value.trim();
+  const file = fileInput.files[0];
+
+  if (!text && !file) return;
+
+  let payload = {
+    sender_id,
+    receiver_id,
+    content: text || null,
+    message_type: "text",
+    file_url: null,
+    file_name: null,
+    file_size: null
+  };
+
+  if (file) {
+    const uploaded = await uploadFile(file);
+    if (!uploaded.file_url) return;
+
+    payload = {
+      sender_id,
+      receiver_id,
+      content: null,
+      message_type: file.type.startsWith("image") ? "image" : "file",
+      file_url: uploaded.file_url,
+      file_name: uploaded.file_name,
+      file_size: uploaded.file_size
+    };
+  }
+
+  socket.emit("send_message", payload);
+  renderMessage(payload, true);
+
+  messageInput.value = "";
+  fileInput.value = "";
+}
+
+function typingEvent(){
+  socket.emit("typing", { senderId: sender_id, receiverId: receiver_id });
+}
+</script>
+
+</body>
+</html>
