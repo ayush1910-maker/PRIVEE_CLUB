@@ -252,6 +252,19 @@ const giveRating = async (req ,res) => {
             rating_count: newCount
         })
 
+        const sender = await User.findByPk(user_id)
+        
+        await sendFCMNotification(
+            ratedUser,
+            "You've Got a New Rating ⭐",
+            `${sender.first_name} ${sender.last_name} Rated you!`,
+            {
+                type: "Rated",
+                sender_id: user_id.toString(),
+                receiver_id: target_user_id.toString()   
+            }
+        )
+
         return res.json({
             status: true,
             message: "Rating saved successfully",
@@ -536,8 +549,8 @@ const getRecievedRequests = async (req ,res) => {
 const AcceptRequest = async (req ,res) => {
     try {
 
-        const user_id = req.user.id
-        const { request_id } = req.body
+        const user_id = req.user.id  // reciever
+        const { request_id } = req.body // sender
 
         const requestId = await User.findByPk(request_id)
 
@@ -559,6 +572,19 @@ const AcceptRequest = async (req ,res) => {
 
         request.status = "Confirmed Request"
         await request.save()
+
+        const reciever = await User.findByPk(user_id)
+
+        await sendFCMNotification(
+            request_id,
+            "Private Access Request Accepted!",
+            `${reciever.first_name} Accepted Your request for private access`,
+            {
+                type: "Private_ACCESS_REQUEST",
+                sender_id: user_id.toString(),
+                receiver_id: request_id.toString()
+            }
+        )
         
         return res.json({
             status: true,
@@ -575,9 +601,9 @@ const AcceptRequest = async (req ,res) => {
 const RejectRequest = async (req, res) => {
     try {
 
-        const receiver_id = req.user.id
+        const receiver_id = req.user.id  // reciever
 
-        const {request_id} = req.body
+        const {request_id} = req.body   // sender
 
         const requestId = await User.findByPk(request_id)
 
@@ -598,6 +624,19 @@ const RejectRequest = async (req, res) => {
         }
 
         await request.destroy()
+
+        const reciever = await User.findByPk(receiver_id)
+
+        await sendFCMNotification(
+            requestId,
+            "Private Access Request Rejected!",
+            `${reciever.first_name} ${reciever.last_name ? last_name : null} reject your private access request`,
+            {
+                type: "Private_ACCESS_REJECTED",
+                receiver_id: receiver_id.toString(),
+                sender_id: request_id.toString()
+            }
+        )
 
         return res.json({
             status: true,

@@ -843,15 +843,437 @@ router.get("/getUploadedPhotos" , verifyJWT , getUploadedPhotos)
 
 router.get("/getUploadedPrivatePhotos" , verifyJWT , getUploadedPrivatePhotos)
 
+
+/**
+ * @swagger
+ * /api/v1/sendRequestPrivateAccess:
+ *   post:
+ *     tags:
+ *       - Private Access
+ *     summary: Send private access request
+ *     description: Sends a private access request from the authenticated user to another user.
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - receiver_id
+ *             properties:
+ *               receiver_id:
+ *                 type: integer
+ *                 example: 5
+ *     responses:
+ *       200:
+ *         description: Request sent successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Request send successfully"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       example: 12
+ *                     sender_id:
+ *                       type: integer
+ *                       example: 3
+ *                     receiver_id:
+ *                       type: integer
+ *                       example: 5
+ *                     status:
+ *                       type: string
+ *                       example: "Pending Request"
+ *       400:
+ *         description: Bad request / validation error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "you already send request"
+ *       401:
+ *         description: Unauthorized - Invalid or missing token
+ */
+
 router.post("/sendRequestPrivateAccess" , verifyJWT , sendRequestPrivateAccess)
+
+
+/**
+ * @swagger
+ * /api/v1/getRecievedRequests:
+ *   get:
+ *     tags:
+ *       - Private Access
+ *     summary: Get received private access requests
+ *     description: Fetches all pending private access requests received by the authenticated user.
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Requests fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "request fetched successfully"
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                         example: 10
+ *                       sender_id:
+ *                         type: integer
+ *                         example: 3
+ *                       receiver_id:
+ *                         type: integer
+ *                         example: 7
+ *                       status:
+ *                         type: string
+ *                         example: "Pending Request"
+ *                       created_at:
+ *                         type: string
+ *                         example: "2026-01-25T10:15:30.000Z"
+ *                       sender:
+ *                         type: object
+ *                         properties:
+ *                           first_name:
+ *                             type: string
+ *                             example: "Ayush"
+ *                           last_name:
+ *                             type: string
+ *                             example: "Sharma"
+ *                           upload_selfie:
+ *                             type: string
+ *                             example: "/uploads/selfie.jpg"
+ *       401:
+ *         description: Unauthorized - Invalid or missing token
+ *       404:
+ *         description: User not found
+ */
 
 router.get("/getRecievedRequests" , verifyJWT , getRecievedRequests)
 
+
+/**
+ * @swagger
+ * /api/v1/AcceptRequest:
+ *   post:
+ *     tags:
+ *       - Private Access
+ *     summary: Accept private access request
+ *     description: Allows the authenticated user to accept a pending private access request and notifies the sender.
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - request_id
+ *             properties:
+ *               request_id:
+ *                 type: integer
+ *                 description: Sender user ID who sent the private access request
+ *                 example: 5
+ *     responses:
+ *       200:
+ *         description: Request accepted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "request Accepted"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       example: 12
+ *                     sender_id:
+ *                       type: integer
+ *                       example: 5
+ *                     receiver_id:
+ *                       type: integer
+ *                       example: 8
+ *                     status:
+ *                       type: string
+ *                       example: "Confirmed Request"
+ *                     updated_at:
+ *                       type: string
+ *                       example: "2026-01-26T09:30:00.000Z"
+ *       400:
+ *         description: Invalid request or request not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "request not found"
+ *       401:
+ *         description: Unauthorized - Invalid or missing token
+ *       404:
+ *         description: User not found
+ */
+
 router.post("/AcceptRequest" , verifyJWT , AcceptRequest)
+
+
+/**
+ * @swagger
+ * /api/v1/RejectRequest:
+ *   post:
+ *     tags:
+ *       - Private Access
+ *     summary: Reject private access request
+ *     description: Allows the authenticated user to reject a pending private access request and notifies the sender.
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - request_id
+ *             properties:
+ *               request_id:
+ *                 type: integer
+ *                 description: Sender user ID who sent the private access request
+ *                 example: 6
+ *     responses:
+ *       200:
+ *         description: Request rejected successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "request reject successfully"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       example: 15
+ *                     sender_id:
+ *                       type: integer
+ *                       example: 6
+ *                     receiver_id:
+ *                       type: integer
+ *                       example: 9
+ *                     status:
+ *                       type: string
+ *                       example: "Pending Request"
+ *       400:
+ *         description: Invalid request or request not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "request not found"
+ *       401:
+ *         description: Unauthorized - Invalid or missing token
+ *       404:
+ *         description: User not found
+ */
 
 router.post("/RejectRequest" , verifyJWT , RejectRequest)
 
+
+/**
+ * @swagger
+ * /api/v1/getConfirmedRequest:
+ *   get:
+ *     tags:
+ *       - Private Access
+ *     summary: Get confirmed private access requests
+ *     description: Fetches all confirmed private access requests for the authenticated user.
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Confirmed requests fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "ConfirmedRequests Fetched!"
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                         example: 21
+ *                       sender_id:
+ *                         type: integer
+ *                         example: 4
+ *                       receiver_id:
+ *                         type: integer
+ *                         example: 9
+ *                       status:
+ *                         type: string
+ *                         example: "Confirmed Request"
+ *                       created_at:
+ *                         type: string
+ *                         example: "2026-01-26T11:20:00.000Z"
+ *                       sender:
+ *                         type: object
+ *                         properties:
+ *                           first_name:
+ *                             type: string
+ *                             example: "Rahul"
+ *                           last_name:
+ *                             type: string
+ *                             example: "Verma"
+ *                           upload_selfie:
+ *                             type: string
+ *                             example: "/uploads/selfie.png"
+ *       401:
+ *         description: Unauthorized - Invalid or missing token
+ */
+
 router.get("/getConfirmedRequest" , verifyJWT , getConfirmedRequest)
+
+
+/**
+ * @swagger
+ * /api/v1/deleteConfirmedRequest:
+ *   delete:
+ *     tags:
+ *       - Private Access
+ *     summary: Remove confirmed private access
+ *     description: Removes a confirmed private access request (unfriend/remove access) for the authenticated user.
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - request_id
+ *             properties:
+ *               request_id:
+ *                 type: integer
+ *                 description: Sender user ID whose confirmed request needs to be removed
+ *                 example: 7
+ *     responses:
+ *       200:
+ *         description: Confirmed request removed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "User remove from freind list"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       example: 30
+ *                     sender_id:
+ *                       type: integer
+ *                       example: 7
+ *                     receiver_id:
+ *                       type: integer
+ *                       example: 12
+ *                     status:
+ *                       type: string
+ *                       example: "Confirmed Request"
+ *                     sender:
+ *                       type: object
+ *                       properties:
+ *                         first_name:
+ *                           type: string
+ *                           example: "Amit"
+ *                         last_name:
+ *                           type: string
+ *                           example: "Kumar"
+ *                         upload_selfie:
+ *                           type: string
+ *                           example: "/uploads/selfie.jpg"
+ *       400:
+ *         description: Invalid request or confirmed request not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "requested user not found"
+ *       401:
+ *         description: Unauthorized - Invalid or missing token
+ */
 
 router.delete("/deleteConfirmedRequest" , verifyJWT , deleteConfirmedRequest)
 
