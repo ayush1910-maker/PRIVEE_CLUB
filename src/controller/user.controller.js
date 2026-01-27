@@ -5,6 +5,7 @@ import {User , lookingFor , UserLookingFor} from "../utils/associations.js"
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import { sendEmailSMTP } from "../utils/nodemailer.js";
+import admin from "../../firebaseAdmin.js";
 
 
 const generateAccessTokens = async function (userId) {
@@ -119,6 +120,41 @@ const login = async (req,res) => {
 
     } catch (error) {
         return res.send({status: false , message: error.message})
+    }
+}
+
+const SocialLogin = async (req ,res) => {
+    try {
+    const { idToken } = req.body;
+
+    if (!idToken){
+        return res.json({ status: false, message: "idToken is required" });
+    }
+
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
+    const { uid, email , first_name} = decodedToken;
+
+    let user = await User.findOne({ where: { email } });
+
+    if (!user) {
+      user = await User.create({
+        email,
+        first_name: first_name || "",
+        firebaseUid: uid
+      });
+    }
+
+    const {accessToken} = await generateAccessTokens(user.id)
+
+    return res.json({
+      status: true,
+      message: "Login successful",
+      accessToken,
+      user
+    });
+        
+    } catch (error) {
+        return res.json({status: false , message: error.message})
     }
 }
 
@@ -513,6 +549,7 @@ export {
     generateAccessTokens,
     register_user,
     login,
+    SocialLogin,
     upload_selfie,
     select_gender,
     get_lookingfor_list,
