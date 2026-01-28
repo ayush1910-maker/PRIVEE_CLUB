@@ -6,7 +6,7 @@ import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import { sendEmailSMTP } from "../utils/nodemailer.js";
 import admin from "../../firebaseAdmin.js";
-
+import Admin from "../models/Admin.model.js"
 
 const generateAccessTokens = async function (userId) {
   try {
@@ -467,21 +467,26 @@ const forget_password = async (req ,res) => {
     try {
         const {email} = req.body
 
-        const user = await User.findOne({where: {email}})
-        if(!user){
-            return res.json({status: false , message: "User not found"})
+        let account = await User.findOne({where: {email}})
+        
+        if(!account){
+           account =  await Admin.findOne({where: {email}})  
+        }
+
+        if (!account) {
+            return res.json({status: false , message: "User/Admin not found"})
         }
 
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
         const hashedOtp = await bcrypt.hash(otp , 10)
 
-        user.otp = hashedOtp
-        user.otp_expires = new Date(Date.now() + 10 * 60 * 1000); 
-        await user.save();
+        account.otp = hashedOtp
+        account.otp_expires = new Date(Date.now() + 10 * 60 * 1000); 
+        await account.save();
 
         await sendEmailSMTP(email, "Password Reset OTP", "otpTemplate", {
-            name: user.name || "User",
+            name: account.first_name || account.name,
             otp,
             expiry: "10 minutes",
         });
@@ -497,16 +502,21 @@ const verify_otp = async (req ,res) => {
     try {
         const { email, otp } = req.body;
         
-        const user = await User.findOne({ where: { email } });
-        if (!user){
-            return res.json({ status: false, message: "User not found" });
+        let account = await User.findOne({ where: { email } });
+
+        if (!account) {
+            account = await Admin.findOne({where: {email}})
+        }
+
+        if (!account){
+            return res.json({ status: false, message: "User/Admin not found" });
         } 
 
-        if (!user.otp || user.otp_expires < Date.now()) {
+        if (!account.otp || account.otp_expires < Date.now()) {
             return res.json({ status: false, message: "OTP expired" });
         }
         
-        const isMatch = await bcrypt.compare(otp, user.otp);
+        const isMatch = await bcrypt.compare(otp, account.otp);
         if (!isMatch){
            return res.json({ status: false, message: "Invalid OTP" });
         } 
@@ -522,8 +532,7 @@ const reset_password = async (req ,res) => {
     try {
     const {password, confirmPassword } = req.body;
     const id = req.user.id
-    console.log("hii" , id);
-    
+
     if (password !== confirmPassword) {
       return res.json({ status: false, message: "Passwords do not match" });
     }
