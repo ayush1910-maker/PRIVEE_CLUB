@@ -17,7 +17,15 @@ const Admin = sequelize.define("admin" ,
         },
         password: {
             type: DataTypes.STRING
-        }
+        },
+        otp: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
+        otp_expires: {
+            type: DataTypes.DATE,
+            allowNull: true
+        },
     },
     {
         tableName: "admin",
