@@ -190,19 +190,6 @@ const User = sequelize.define("user" ,
         last_login_at: {
             type: DataTypes.DATE,
         },
-
-        fcm_token: {
-            type: DataTypes.TEXT
-        },
-        login_type: {
-            type: DataTypes.STRING
-        },
-        social_id: {
-            type: DataTypes.STRING
-        },
-        device_type: {
-            type: DataTypes.STRING
-        }
         
     },
     
