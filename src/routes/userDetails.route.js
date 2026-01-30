@@ -3,6 +3,7 @@ import Joi from "joi"
 import { validate } from "../utils/validate.js"
 import { AcceptRequest, AddRatingsTitles, blockUser, deleteConfirmedRequest, getConfirmedRequest, getNewApplicants, getNewestBeautifulMembers, getPopularMembers, getReadyToInteract, getRecievedRequests, getShoutOut, getUploadedPhotos, getUploadedPrivatePhotos, getUserRatings, giveRating, HomeScreen, RejectRequest, reportUser, sendRequestPrivateAccess, unBlockUser } from "../controller/userDetails.controller.js"
 import verifyJWT from "../middlewares/auth.middleware.js"
+import checkPrivateAcess from "../middlewares/checkPrivateAccess.middleware.js"
 
 
 const router = express.Router()
@@ -841,7 +842,7 @@ router.get("/getUploadedPhotos" , verifyJWT , getUploadedPhotos)
  *                         example: "2025-12-10T07:00:00.000Z"
  */
 
-router.get("/getUploadedPrivatePhotos" , verifyJWT , getUploadedPrivatePhotos)
+router.get("/getUploadedPrivatePhotos" , verifyJWT , checkPrivateAcess , getUploadedPrivatePhotos)
 
 
 /**
