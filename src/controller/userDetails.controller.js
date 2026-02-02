@@ -471,11 +471,9 @@ const sendRequestPrivateAccess = async (req ,res) => {
         }
 
         const existingRequest = await Request.findOne({
-            where: {
-                [Op.or]: [
-                    {sender_id , receiver_id},
-                    {sender_id: receiver_id , receiver_id: sender_id}
-                ]
+              where: {
+                sender_id: sender_id,     
+                receiver_id: receiver_id  
             }
         })
 
