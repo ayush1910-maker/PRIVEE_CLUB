@@ -8,8 +8,10 @@ const verifyJWT = async (req, res, next) => {
     
     if (req.cookies?.accessToken) {
       token = req.cookies.accessToken;
-    } else if (req.header("Authorization")) {
+    } 
+    else if (req.header("Authorization")) {
       const authHeader = req.header("Authorization");
+
       if (authHeader.startsWith("Bearer ")) {
         token = authHeader.replace("Bearer ", "").trim();
       }
@@ -35,19 +37,16 @@ const verifyJWT = async (req, res, next) => {
       throw new ApiError(401, "User not found");
     }
 
-    
     if (dbUser.force_logged_out) {
       throw new ApiError(
         401,
         "Session expired due to account restrictions. Please login again."
       );
     }
-
     
     if (decodedToken.token_version !== dbUser.token_version) {
       throw new ApiError(401, "Token is no longer valid. Please login again.");
     }
-
     
     req.user = dbUser;
     next();
