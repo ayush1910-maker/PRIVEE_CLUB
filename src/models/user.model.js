@@ -122,11 +122,11 @@ const User = sequelize.define("user" ,
             allowNull: true
         },
         about_me: {
-            type: DataTypes.STRING,
+            type: DataTypes.TEXT,
             allowNull: true
         },
         about_your_perfect_match: {
-            type: DataTypes.STRING,
+            type: DataTypes.TEXT,
             allowNull: true
         },
         // user intrests
